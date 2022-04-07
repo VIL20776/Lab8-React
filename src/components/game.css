@@ -1,0 +1,10 @@
+.gameGrid {
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+}
+
+img {
+    width: 150px;
+    height: 250px;
+}
+

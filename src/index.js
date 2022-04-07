@@ -1,8 +1,6 @@
 import React from 'react';
-import ReactDom from 'react-dom';
+import {createRoot} from 'react-dom/client';
 import Board from './components/board.js';
 
-ReactDom.render(
-    <Board/>, 
-    document.getElementById('board')
-);
+const root = createRoot(document.getElementById('board'));
+root.render(<Board/>);

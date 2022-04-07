@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import images from '../assets/images.js';
 import Card from './cards.js';
+import './game.css'
 
 export default function Board() {
     
     const [counter, setCounter] = useState(0); //contador de acciones
-    const [cards, setCards] = useState([]); //Array de cartas
+    const [cards, setCards] = useState([]); //Primera fila
     const [compareCard, setCompareCard] = useState(null);
 
     useEffect(() => {
@@ -23,44 +24,24 @@ export default function Board() {
     function initGame () {
         let set1 = images;  //Primera mitad de cartas
         let set2 = images;  //Segunda mitad de cartas
-        let newCardSet = cards;
+        let newCardSet = [];
         for (let i = 0; i < images.length; i++) {
-            x = randomInt(set1.length);
-            y = randomInt(set2.length);
+            let x = randomInt(set1.length);
+            let y = randomInt(set2.length);
             
             let img1 = set1.splice(x,1)[0];
-            newCardSet.push(
-                <Card 
-                    img = {img1} 
-                    updateCounter={updateCounter}
-                />
-            );
+            newCardSet.push(img1);
 
             let img2 = set2.splice(y,1)[0];
-            newCardSet.push(
-                <Card 
-                    img = {img2} 
-                    updateCounter={updateCounter}
-                />
-            );
+            newCardSet.push(img2);
         }
         setCards([...newCardSet]);  //Cartas de juego
-    }
-
-    //Agrega una carta al tablero
-    function createCard () {
-        if (cards.length == 0) return <Card/>
-
-        let updateCards = cards;
-        let card = updateCards.shift();
-        setCards([...updateCards]);
-        return card;
     }
 
     //Actualiza el contador de movimientos
     function updateCounter() {
         let updateCounter = counter;
-        updateCounter = Math.floor(updateCounter + 1);
+        updateCounter += 1;
         setCounter(updateCounter);
     }
     
@@ -72,31 +53,12 @@ export default function Board() {
                 <button onClick={initGame}>Iniciar el juego</button>
             </div>
 
-            <form>
-                <div className='row'>
-                    {createCard()}
-                    {createCard()}
-                    {createCard()}
-                    {createCard()}
-                </div>
-                <div className='row'>
-                    {createCard()}
-                    {createCard()}
-                    {createCard()}
-                    {createCard()}
-                </div>
-                <div className='row'>
-                    {createCard()}
-                    {createCard()}
-                    {createCard()}
-                    {createCard()}
-                </div>
-                <div className='row'>
-                    {createCard()}
-                    {createCard()}
-                    {createCard()}
-                    {createCard()}
-                </div>
+            <form className='gameGrid'>
+                {
+                    cards.map(card => {
+                        return(<Card img={card}/>)
+                    })
+                }
             </form>
         </>
     );
