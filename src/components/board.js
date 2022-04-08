@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import images from '../assets/images.js';
+import images from '../assets/front.js';
 import Card from './cards.js';
 import './game.css'
 
 export default function Board() {
     
     const [counter, setCounter] = useState(0); //contador de acciones
-    const [cards, setCards] = useState([]); //Primera fila
-    const [compareCard, setCompareCard] = useState(null);
+    const [cards, setCards] = useState([]); //cartas de juego
+    const [compareCard, setCompareCard] = useState([]); //Cartas comparadas
+    const [comparing, setComparing] = useState(false);  //Si se esta comparando
 
+    //Actualiza el contador
     useEffect(() => {
-            let counter = document.getElementById('counter');
-            counter.innerHTML = `Movimientos realizados: ${counter/2}`
+            //initGame();
+            let count = document.getElementById('counter');
+            count.innerHTML = `Movimientos realizados: ${Math.floor(counter/2)}`;
         }
     );
     
@@ -22,8 +25,8 @@ export default function Board() {
 
     //Inicializa el juego con un orden aleatorio
     function initGame () {
-        let set1 = images;  //Primera mitad de cartas
-        let set2 = images;  //Segunda mitad de cartas
+        let set1 = [...images];  //Primera mitad de cartas
+        let set2 = [...images];  //Segunda mitad de cartas
         let newCardSet = [];
         for (let i = 0; i < images.length; i++) {
             let x = randomInt(set1.length);
@@ -38,11 +41,27 @@ export default function Board() {
         setCards([...newCardSet]);  //Cartas de juego
     }
 
-    //Actualiza el contador de movimientos
-    function updateCounter() {
-        let updateCounter = counter;
-        updateCounter += 1;
-        setCounter(updateCounter);
+    function comparator(img) {
+        //Si no hay coincidencia, se elimina del array de comparacion
+        if (compareCard[compareCard.lenght-1] != img && comparing) {
+            let newCompare = compareCard;
+            newCompare.pop();
+            setCompareCard([...newCompare])
+            setComparing(false); //Salir modo de comparacion
+            return false;
+        }
+
+        //Si no se ha comparado antes, se agrega al array de comparacion
+        if (!compareCard.includes(img) && !comparing) {
+            let newCompare = compareCard;
+            newCompare.push(img);
+            setCompareCard([...newCompare]);
+            setComparing(true); //Entrar modo de comparacion
+            return true;
+        }
+
+        setComparing(false);
+        return true;
     }
     
     return (
@@ -56,7 +75,12 @@ export default function Board() {
             <form className='gameGrid'>
                 {
                     cards.map(card => {
-                        return(<Card img={card}/>)
+                        return(<Card 
+                            img={card}
+                            counter={counter}
+                            setCounter={setCounter}
+                            keepFlipped={compareCard.includes(card)}
+                            comparator={comparator}/>)
                     })
                 }
             </form>
