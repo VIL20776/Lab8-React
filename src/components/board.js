@@ -7,15 +7,14 @@ export default function Board() {
     
     const [counter, setCounter] = useState(0); //contador de acciones
     const [cards, setCards] = useState([]); //cartas de juego
-    const [compareCard, setCompareCard] = useState([]); //Cartas comparadas
-    const [comparing, setComparing] = useState(false);  //Si se esta comparando
+    const [foundPairs, setFoundPairs] = useState([]); //Pares encontrados
+    const [foundCard, setFoundCard] = useState(null);   //Carta a comparar
+    const [foundIds, setFoundIds] = useState([]);   //Ids de cartas selecionadas
 
-    //Actualiza el contador
-    useEffect(() => {
-            //initGame();
-            let count = document.getElementById('counter');
-            count.innerHTML = `Movimientos realizados: ${Math.floor(counter/2)}`;
-        }
+    //Inicializar el juego
+    useEffect(
+        () => {initGame()},
+        []    
     );
     
 
@@ -25,6 +24,11 @@ export default function Board() {
 
     //Inicializa el juego con un orden aleatorio
     function initGame () {
+        setCounter(0);
+        setFoundPairs([]);
+        setFoundCard(null);
+        setFoundIds([]);
+
         let set1 = [...images];  //Primera mitad de cartas
         let set2 = [...images];  //Segunda mitad de cartas
         let newCardSet = [];
@@ -41,45 +45,62 @@ export default function Board() {
         setCards([...newCardSet]);  //Cartas de juego
     }
 
-    function comparator(img) {
-        //Si no hay coincidencia, se elimina del array de comparacion
-        if (compareCard[compareCard.lenght-1] != img && comparing) {
-            let newCompare = compareCard;
-            newCompare.pop();
-            setCompareCard([...newCompare])
-            setComparing(false); //Salir modo de comparacion
-            return false;
-        }
-
-        //Si no se ha comparado antes, se agrega al array de comparacion
-        if (!compareCard.includes(img) && !comparing) {
-            let newCompare = compareCard;
-            newCompare.push(img);
-            setCompareCard([...newCompare]);
-            setComparing(true); //Entrar modo de comparacion
-            return true;
-        }
-
-        setComparing(false);
-        return true;
+    function updateCounter() {
+        setCounter(counter + 1);
     }
+
+    function comparator(img) {
+        //Si hay coincidencia, se ingresa al array de comparacion
+        if (foundCard == img) {
+            let newPair = foundPairs;
+            newPair.push(img);
+            setFoundPairs([...newPair])
+        }
+
+        if (foundIds.length == 2) {
+            setTimeout( () => {
+                setFoundCard(null);
+                setFoundIds([]);
+            }, 800);
+        }
+    }
+
+    function setCompareCard (id, img) {
+        //Si no se ha comparado antes, se agrega al array de comparacion
+        if (!foundIds.includes(id)) {
+            let newId = foundIds;
+            newId.push(id);
+            setFoundIds([...newId]);
+
+            if(foundCard == null){
+                setFoundCard(img);
+            }
+        }
+    
+    }
+    
     
     return (
         <>
             <h1>Juego de Memoria</h1>
-            <h2 id='counter'></h2>
+            <h2>Movimientos realizados: {Math.floor(counter/2)}</h2>
             <div>
-                <button onClick={initGame}>Iniciar el juego</button>
+                <button onClick={initGame}>Nuevo juego</button>
+            </div>
+            <div>
+                {foundPairs.length == images.length && <h3>Has completado el juego</h3>}
             </div>
 
             <form className='gameGrid'>
                 {
-                    cards.map(card => {
+                    cards.map((card, index) => {
                         return(<Card 
+                            id={index}
                             img={card}
-                            counter={counter}
-                            setCounter={setCounter}
-                            keepFlipped={compareCard.includes(card)}
+                            updateCounter={updateCounter}
+                            keepFlipped={foundPairs.includes(card)}
+                            isComparing={foundIds.includes(index)}
+                            setCompareCard={setCompareCard}
                             comparator={comparator}/>)
                     })
                 }

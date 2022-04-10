@@ -1,33 +1,32 @@
-import React, {useState,useEffect} from 'react';
+import React, {useState} from 'react';
 import ReactCardFlip from 'react-card-flip';
 import back from '../assets/back/ShinMegamiTenseiLogo.webp';
 //import './cards.css';
 
-export default function Card ({img, counter, setCounter, keepFlipped, comparator}) {
-    const [isFlipped, setIsFlipped] = useState(false);
-
-    useEffect(() => {
-            if (isFlipped) setIsFlipped(keepFlipped);
-        }
-    );
-    
+export default function Card (
+    {
+        //Props
+        id, 
+        img, 
+        updateCounter, 
+        keepFlipped, 
+        isComparing, 
+        comparator, 
+        setCompareCard
+    }) {
 
     function handleClick(e) {
         e.preventDefault();
-        if (!isFlipped) {
-            setCounter(counter + 1);
-            setIsFlipped(!isFlipped);
-            setInterval(
-                setIsFlipped(comparator(img)),
-                1000
-            )
-            
+        if (!isComparing || !keepFlipped) {
+            updateCounter();
+            setCompareCard(id, img)
+            comparator(img);
         }
     }
 
     return (
         <>
-            <ReactCardFlip isFlipped={isFlipped} flipDirection="horizontal">
+            <ReactCardFlip isFlipped={keepFlipped || isComparing} flipDirection="vertical">
                 <div>
                     <button onClick={handleClick} className='card'>
                         <img src={back}/>
