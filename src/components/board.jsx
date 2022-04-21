@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import images from '../assets/front';
 import Card from './cards';
 import './game.css';
@@ -15,7 +15,7 @@ export default function Board() {
   }
 
   // Inicializa el juego con un orden aleatorio
-  function initGame() {
+  const initGame = useCallback(() => {
     setCounter(0);
     setFoundPairs([]);
     setFoundCard(null);
@@ -35,7 +35,7 @@ export default function Board() {
       newCardSet.push(img2);
     }
     setCards([...newCardSet]); // Cartas de juego
-  }
+  }, []);
 
   const updateCounter = () => {
     setCounter(counter + 1);
@@ -73,7 +73,7 @@ export default function Board() {
   // Inicializar el juego
   useEffect(() => {
     initGame();
-  });
+  }, [initGame]);
 
   return (
     <>
